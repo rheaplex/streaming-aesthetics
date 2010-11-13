@@ -20,6 +20,8 @@ COUNT_DEFAULT = 10
 #TODO Can we hide the password?
 username = str(raw_input("Twitter username:"))
 password = utilities.getpass("Twitter password:")
+# Make sure the user can see their password has been accepted
+print
 
 def category_total_count(counts, category_keys):
     """Get the total of all the counts for all the keys in the category"""
