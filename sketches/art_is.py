@@ -26,8 +26,8 @@ def is_art_is(tweet_text):
     return re.search(r'\bart is\b', tweet_text, re.IGNORECASE)
 
 def ignore_word(word):
-    """Ignore urls and short words"""
-    return ("://" in word) and (len(word) <= 2)
+    """Ignore urls, @messages and emails, and short words"""
+    return (len(word) <= 2) or ("://" in word) or ("@" in word)
 
 def extract_terms(tweet_text):
     """Get runs of characters as words, and discard stopwords"""
