@@ -5,7 +5,7 @@ import simplejson
 import sys
 import termios
 
-#from http://docs.python.org/library/termios.html
+# from http://docs.python.org/library/termios.html
 def getpass(prompt="Password: "):
     import termios, sys
     fd = sys.stdin.fileno()

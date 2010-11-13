@@ -16,6 +16,8 @@ ENGLISH_STOPWORDS = ["a's", "able", "about", "above", "according", "accordingly"
 #TODO Can we hide the password?
 username = str(raw_input("Twitter username:"))
 password = utilities.getpass("Twitter password:")
+# Make sure the user can see their password has been accepted
+print
 
 # Have to search for individual words, so can't search directly for "art is"
 
