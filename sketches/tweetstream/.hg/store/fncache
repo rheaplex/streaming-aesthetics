@@ -1,9 +1,0 @@
-data/.hgignore.i
-data/.hgtags.i
-data/CHANGELOG.i
-data/LICENSE.i
-data/README.i
-data/servercontext.py.i
-data/setup.py.i
-data/tests/test_tweetstream.py.i
-data/tweetstream/__init__.py.i
