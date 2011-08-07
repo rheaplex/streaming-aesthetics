@@ -23,7 +23,8 @@ import javax.swing.*;
 
 import fullscreen.*;
 import japplemenubar.*; // Fullscreen imports this
-import com.twitter.processing.*;
+import twitter4j.*;
+import twitter4j.conf.*;
 
 /*******************************************************************************
   Configuration
@@ -233,17 +234,14 @@ Hashtable setupPalette () {
 
 // Make the streaming api query for the colours from the palette
 
-String setupQuery (Hashtable terms)
-{
-  String query = twitterStreamingTrack;
-  Enumeration en = terms.keys();
-  while (en.hasMoreElements()) {
-    query += (String)en.nextElement();
-    if (en.hasMoreElements()) {
-      query += ",";
-    }
+String[] coloursArray () {
+  Enumeration keys = colours.keys();
+  String[] keyArray = new String[colours.size()];
+  Enumeration en = colours.keys();
+  for (int i = 0; i < colours.size(); i++) {
+    keyArray[i] = (String)keys.nextElement();
   }
-  return query;
+  return keyArray;
 }
 
 // The Processing setup method
@@ -251,13 +249,10 @@ String setupQuery (Hashtable terms)
 void setup () {
   // Make the data structures
   colours = setupPalette();
-  query = setupQuery(colours);
   lines = new LinkedList();
   // Get the information we need to configure the program
   boolean configured = setupConfiguration();
   if (configured) {
-    TweetStream s = new TweetStream(this, "stream.twitter.com",
-                                    80, query, twitterUser, twitterPassword);
     if (fullscreen) {
       Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
       sizeWidth = screen.width;
@@ -272,7 +267,7 @@ void setup () {
     }
     // Set the initial "last drawing time" as late as possible
     lastDrawMillis = millis();
-    s.go();
+    initializeStatusListener (coloursArray(), twitterUser, twitterPassword);
     // Seems to help convince the sketch to run on Fedora 13
     frameRate(24);
     loop();
@@ -302,14 +297,32 @@ void insertColourValues (String message, LinkedList insertIn) {
   }
 }
 
-// Tweet Streaming library callback function
+// The streaming API processor
+TwitterStream twitterStream;
 
-void tweet (Status tweet) {
-  // Add and iterator get are in different threads, so synchronize
-  synchronized (lines) {
-    println(tweet.text());
-    insertColourValues(tweet.text(), lines);
-  }
+void initializeStatusListener (String[] terms, String user, String password) {
+  ConfigurationBuilder builder = new ConfigurationBuilder();
+  builder.setUser(user);
+  builder.setPassword(password);
+  twitterStream = new TwitterStreamFactory(builder.build()).getInstance();
+  StatusListener listener = new StatusListener(){
+    public void onStatus(Status status) {
+      System.out.println(status.getUser().getName() + " : " + status.getText());
+      // Add and iterator get are in different threads, so synchronize
+      synchronized (lines) {
+        insertColourValues(status.getText(), lines);
+      }
+    }
+    public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {}
+    public void onTrackLimitationNotice(int numberOfLimitedStatuses) {}
+    public void onScrubGeo(long lat, long lon) {}
+    public void onException(Exception ex) {
+      ex.printStackTrace();
+    }
+  };
+  twitterStream.addListener(listener);
+  FilterQuery query = new FilterQuery(0, null, terms);
+  twitterStream.filter(query);
 }
 
 
@@ -385,6 +398,8 @@ boolean barIsFinished (float origin) {
 void draw () {
   // Add and iterator get are in different threads, so synchronize
   synchronized (lines) {
+    smooth();
+    background(255);
     noStroke();
     updateOrigin();
     float offset = initialOffset();
