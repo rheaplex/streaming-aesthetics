@@ -127,6 +127,7 @@ class Star extends Shape {
 
 class Polygon extends Shape {
   protected int sides;
+  protected float start_angle;
   
   void polygon(int n, float cx, float cy, float w, float h, float startAngle)
   {
@@ -150,10 +151,22 @@ class Polygon extends Shape {
       endShape(CLOSE);
     }
   }
+    
+  void draw () {
+    polygon(sides, 0, 0, diameter, diameter, radians(start_angle));
+    /*stroke(0,0,255);
+    ellipseMode(CENTER);
+    ellipse(0, 0, diameter, diameter);
+    stroke(0,0,0);
+    stroke(255,0,0);
+    ellipseMode(CENTER);
+    ellipse(0, 0, innerDiameter(), innerDiameter());
+    stroke(0,0,0);*/
+  }
   
   // https://secure.wikimedia.org/wikipedia/en/wiki/Apothem
   float innerDiameter () {
-   return (diameter * cos(PI / sides));
+   return diameter * cos(PI / sides);
   }
   
   void setSizeFromInnerDiameter (float value) {
@@ -164,10 +177,68 @@ class Polygon extends Shape {
 class Triangle extends Polygon {
   Triangle () {
     sides = 3;
+    start_angle = 30;
+  }
+}
+
+class Pentagon extends Polygon {
+  Pentagon () {
+    sides = 5;
+    start_angle = 55;
+  }
+}
+
+class Hexagon extends Polygon {
+  Hexagon () {
+    sides = 6;
+    start_angle = 0;
+  }
+}
+
+class Point {
+ float x;
+ float y;
+ 
+ Point(float x, float y) {
+   this.x = x;
+   this.y =y;
+ }
+}
+
+class Cross extends Shape {
+  private static final float side_angle = 60;
+  
+  Point circlept(float angle) {
+    float t = radians(angle);
+    float radius = diameter / 2.0;
+    return new Point(radius * sin(t), radius * cos(t));
   }
   
   void draw () {
-    polygon(3, 0, 0, diameter, diameter, radians(30));
+    // Construct the cross using points on the radius
+    // top right top
+    Point p1 = circlept(0 + (side_angle / 2));
+    // right top right
+    Point p2 = circlept(90 - (side_angle / 2));
+    // bottom bottom left
+    Point p3 = circlept(180 + (side_angle / 2));
+    // left bottom left
+    Point p4 = circlept(270 - (side_angle / 2));
+    beginShape();
+    vertex(p1.x, p1.y); // .
+    vertex(p1.x, p2.y); // |
+    vertex(p2.x, p2.y); // -
+    vertex(p2.x, p4.y); // |
+    vertex(p1.x, p4.y); // -
+    vertex(p1.x, p3.y); // |
+    vertex(p3.x, p3.y); // -
+    vertex(p3.x, p4.y); // |
+    vertex(p4.x, p4.y); // _
+    vertex(p4.x, p2.y); // |
+    vertex(p3.x, p2.y); // -
+    vertex(p3.x, p1.y); // |
+    vertex(p1.x, p1.y); // -.
+    endShape();
     /*stroke(0,0,255);
     ellipseMode(CENTER);
     ellipse(0, 0, diameter, diameter);
@@ -177,85 +248,22 @@ class Triangle extends Polygon {
     ellipse(0, 0, innerDiameter(), innerDiameter());
     stroke(0,0,0);*/
   }
-}
-
-class Cross extends Shape {
-  void draw () {
-    float half = diameter / 2.0;
-    float quarter = diameter / 4.0;
-    beginShape();
-    vertex(-quarter, half);
-    vertex(quarter, half);
-    vertex(quarter, quarter);
-    vertex(half, quarter);
-    vertex(half, -quarter);
-    vertex(quarter, -quarter);
-    vertex(quarter, -half);
-    vertex(-quarter, -half);
-    vertex(-quarter, -quarter);
-    vertex(-half, -quarter);
-    vertex(-half, quarter);
-    vertex(-quarter, quarter);
-    vertex(-quarter, half);
-    endShape();
-    stroke(0,0,255);
-    ellipseMode(CENTER);
-    ellipse(0, 0, diameter, diameter);
-    stroke(0,0,0);
-    stroke(255,0,0);
-    ellipseMode(CENTER);
-    ellipse(0, 0, innerDiameter(), innerDiameter());
-    stroke(0,0,0);
-  }
   
   float innerDiameter () {
-    return sqrt((diameter * (diameter / 2)));
+    // Calculate the x and y of the inside top right point
+    // Get distance from inside point to that
+    // so sqrt(pow(p1.x, 2) + pow(p2.y, 2));
+    // This simplifies to:
+    return sqrt(pow(diameter * sin(radians(0 + (side_angle / 2))), 2) + 
+                pow(diameter * cos(radians(90 - (side_angle / 2))), 2));
+  }
+  
+  void setSizeFromInnerDiameter (float value) {
+      // Nope, no idea. Set arbitrarily for 60 degrees
+      // Figure out later...
+      diameter = value * 1.4;
   }
 }
-
-/*
-class Arrow extends Shape {
-  void draw () {
-    beginShape();
-    vertex(shapeSize / 2.0, 0.0);
-    vertex(shapeSize, shapeSize / 1.6);
-    vertex(shapeSize * 0.6666, shapeSize / 1.6);
-    vertex(shapeSize * 0.6666, shapeSize);
-    vertex(shapeSize * 0.3333, shapeSize);
-    vertex(shapeSize * 0.3333, shapeSize / 1.6);
-    vertex(0.0, shapeSize / 1.6);
-    vertex(shapeSize / 2.0, 0.0);
-    endShape();
-  }
-}
-
-class Rectangle extends Shape {
-  void draw () {
-    rectMode(CENTER);
-    rect(0, 0, shapeSize * 1.5, shapeSize * 0.75);
-  }
-}
-
-class Oval extends Shape {
-  void draw () {
-    ellipseMode(CENTER);
-    ellipse(0, 0, shapeSize * 1.5, shapeSize * 0.75);
-  }
-}
-
-class Crescent extends Shape {
-  void draw () {
-    float threeQuarters = shapeSize * 0.75;
-    float oneAndAQuarter = shapeSize * 1.27; // misnomer
-    beginShape();
-    vertex(0.0, 0.0);
-    bezierVertex(oneAndAQuarter, 0.0, oneAndAQuarter, shapeSize, 0.0,
-                 shapeSize);
-    bezierVertex(threeQuarters, shapeSize, threeQuarters, 0.0, 0.0, 0.0);
-    endShape();
-  }
-}
-*/
 
 // Make the appropriate shape
 
@@ -263,21 +271,19 @@ Shape makeShape(String name) {
   Shape shape = null;
   if(name == "circle") {
     shape = new Circle();
-  } else if (name == "square") {
-    shape = new Square();
   } else if (name == "triangle") {
     shape = new Triangle();
+  } else if (name == "square") {
+    shape = new Square();
+  } else if (name == "pentagon") {
+    shape = new Pentagon();
+  } else if (name == "hexagon") {
+    shape = new Hexagon();
   } else if (name == "star") {
     shape = new Star();
-  }else if (name == "cross") {
+  } else if (name == "cross") {
     shape = new Cross();
-  }/* else if (name == "rectangle") {
-    shape = new Rectangle();
-  } else if (name == "oval") {
-    shape = new Oval();
-  } else if (name == "crescent") {
-    shape = new Crescent();
-  }*/
+  }
   return shape;
 }
 
