@@ -43,7 +43,6 @@ float growth_rate = growth_rate_per_second /1000;
 boolean fullscreen;
 
 // The list of shapes used in drawing
-// Cheat for "star", otherwise it floods...
 String[] shapes = {"circle", "triangle", "square", "pentagon", "hexagon", "star", "cross"};
 
 // How thick the lines should be

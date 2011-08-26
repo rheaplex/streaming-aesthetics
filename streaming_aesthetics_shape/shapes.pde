@@ -39,7 +39,8 @@ class Shape {
   // Check whether the shape has moved off the drawing area
   // Subclass should override
   boolean largeEnoughToRemove () {
-    return innerDiameter() > sizeMax;
+    // Make entirely sure the shape is off the screen
+    return innerDiameter() > sizeMax * 2;
   }
 
   // Implemented by subclasses
