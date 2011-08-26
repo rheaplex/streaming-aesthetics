@@ -43,10 +43,11 @@ float growth_rate = growth_rate_per_second /1000;
 boolean fullscreen;
 
 // The list of shapes used in drawing
-String[] shapes = {"circle", "square", "triangle"};//, "star"};//, "cross"};//, "rectangle", "oval", "cross"};
+// Cheat for "star", otherwise it floods...
+String[] shapes = {"circle", "triangle", "square", "pentagon", "hexagon", "star", "cross"};
 
 // How thick the lines should be
-float lineWidth = 3;
+float lineWidth = 2.9;
 
 // The amount to pad shapes by
 float padding = 20.0;
