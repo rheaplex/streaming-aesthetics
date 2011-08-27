@@ -39,11 +39,9 @@ int sizeMax = max(sizeWidth, sizeHeight);
 float growth_rate_per_second = 10;
 float growth_rate = growth_rate_per_second /1000;
 
-// Should this run full screen?
-boolean fullscreen;
 
 // The list of shapes used in drawing
-String[] shapes = {"circle", "triangle", "square", "pentagon", "hexagon", "star", "cross"};
+String[] shapes = {"circle", "triangle", "square", "pentagon", "hexagon"};//, "star", "cross"};
 
 // How thick the lines should be
 float lineWidth = 2.9;
