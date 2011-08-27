@@ -262,7 +262,7 @@ class Cross extends Shape {
   void setSizeFromInnerDiameter (float value) {
       // Nope, no idea. Set arbitrarily for 60 degrees
       // Figure out later...
-      diameter = value * 1.4;
+      diameter = value * 1.43;
   }
 }
 

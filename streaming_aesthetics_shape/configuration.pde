@@ -5,7 +5,9 @@
 // The user's Twitter account login details
 String twitterUser;
 String twitterPassword;
-String query;
+
+// Should this run full screen?
+boolean fullscreen;
 
 /*******************************************************************************
   Twitter User Details
@@ -84,7 +86,7 @@ class ConfigurationDialog extends JDialog implements ActionListener
 
 Properties getConfigurationProperties () {
   Properties properties = new Properties();
-  InputStream propStream = openStream("./twitter.properties");
+  InputStream propStream = openStream("./configuration.properties");
   if (propStream != null) {
     try {
       properties.load(propStream);
@@ -105,9 +107,7 @@ boolean configureFromProperties () {
   if((p != null) && (p.containsKey("username")) && p.containsKey("password")) {
     twitterUser = (String)p.getProperty("username");
     twitterPassword = (String)p.getProperty("password");
-    if(p.containsKey("fullscreen")) {
-      fullscreen = ((String)p.getProperty("fullscreen", "false").toLowerCase()) == "true";
-    }
+    fullscreen = ((String)p.getProperty("fullscreen", "false").toLowerCase()).equals("true");
     configured = true;
   }
   return configured;

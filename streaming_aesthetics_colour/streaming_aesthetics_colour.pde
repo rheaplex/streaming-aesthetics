@@ -164,7 +164,7 @@ class ConfigurationDialog extends JDialog implements ActionListener
 
 Properties getConfigurationProperties () {
   Properties properties = new Properties();
-  InputStream propStream = openStream("twitter.properties"); 
+  InputStream propStream = openStream("configuration.properties"); 
   if (propStream != null) {
     try {
       properties.load(propStream);
@@ -185,15 +185,9 @@ boolean configureFromProperties () {
   if((p != null) && (p.containsKey("username")) && p.containsKey("password")) {
     twitterUser = (String)p.getProperty("username");
     twitterPassword = (String)p.getProperty("password");
-    if(p.containsKey("vertical")) {
-      vertical = ((String)p.getProperty("vertical", "false").toLowerCase()) == "true";
-    }
-    if(p.containsKey("vertical")) {
-      reverseDirection = ((String)p.getProperty("reverse", "false").toLowerCase()) == "true";
-    }
-    if(p.containsKey("vertical")) {
-      fullscreen = ((String)p.getProperty("fullscreen", "false").toLowerCase()) == "true";
-    }
+    vertical = ((String)p.getProperty("vertical", "false").toLowerCase()).equals("true");
+    reverseDirection = ((String)p.getProperty("reverse", "false").toLowerCase()).equals("true");
+    fullscreen = ((String)p.getProperty("fullscreen", "false").toLowerCase()).equals("true");
     configured = true;
   }
   return configured;
