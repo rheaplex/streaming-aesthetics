@@ -1,0 +1,25 @@
+Streaming Aesthetics CLI
+========================
+
+Rob Myers <rob@robmyers.org>
+
+twitterstream.py
+----------------
+
+A(n oversized) console-based cultural analytics/telemetry application.
+Watch running totals of arts-associated word usage on Twitter.
+
+To install dependencies:
+
+sudo pip install TwitterAPI
+
+To configure:
+
+See the instructions in auth_secrets.py.template .
+
+To run:
+
+Resize your console window to be about double usual size, fullscreen works well.
+Then type:
+
+python aesthetics_totals.py
