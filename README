@@ -1,0 +1,10 @@
+Streaming Aesthetics
+====================
+
+Rob Myers <rob@robmyers.org>
+
+Programs to analyze and visualize aesthetic statements on Twitter via the Streaming API.
+
+Code in Processing and Python.
+
+The preparatory and discard directories contain unfinished and probably un-runnable code.
