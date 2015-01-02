@@ -1,12 +1,66 @@
-import twitter4j.*;
 import twitter4j.conf.*;
+import twitter4j.api.*;
+import twitter4j.*;
+import java.util.*;
+import java.util.regex.*;
+
 
 /*******************************************************************************
   Streaming query.
 *******************************************************************************/
 
-// The query
-String query;
+ConfigurationBuilder cb;
+Query query;
+
+// Set up the twitter connection using config from configuration.properties
+
+TwitterStream makeTwitterStream() {
+  Properties p = new Properties();
+  InputStream propStream = openStream("configuration.properties");
+  try {
+    p.load(propStream);
+  } catch (IOException e)
+  {
+    System.out.println(e);
+    noLoop();
+  }
+  cb = new ConfigurationBuilder();
+  cb.setOAuthConsumerKey((String)p.getProperty("consumerKey"));
+  cb.setOAuthConsumerSecret((String)p.getProperty("consumerSecret"));
+  cb.setOAuthAccessToken((String)p.getProperty("accessToken"));
+  cb.setOAuthAccessTokenSecret((String)p.getProperty("accessSecret"));
+  return new TwitterStreamFactory(cb.build()).getInstance();
+}
+
+// Create the object that handles matches on the Twitter stream
+
+StatusListener createStatusListener() {
+ return new StatusListener(){
+    public void onStatus(Status status){
+      insertShapes (status.getText());
+    }
+    public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {}
+    public void onTrackLimitationNotice(int numberOfLimitedStatuses) {}
+    public void onStallWarning(StallWarning warning) {}
+    public void onScrubGeo(long userId, long upToStatusId) {}
+    public void onException(Exception ex) {
+      ex.printStackTrace();
+    }
+  };
+}
+
+// Tie the Twitter stream search to its handler
+
+TwitterStream createFilteredStream(StatusListener listener) {
+  TwitterStream ts = makeTwitterStream();
+  FilterQuery fq = new FilterQuery();
+  fq.track(shapes);
+
+  ts.addListener(listener);
+  ts.filter(fq);
+  return ts;
+}
+
 
 /*******************************************************************************
   The list of shapes found in Tweets but not yet being drawn.
@@ -68,6 +122,7 @@ void initializeStatusListener (String[] terms, String user, String password) {
     }
     public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {}
     public void onTrackLimitationNotice(int numberOfLimitedStatuses) {}
+    public void onStallWarning(StallWarning warning) {}
     public void onScrubGeo(long lat, long lon) {}
     public void onException(Exception ex) {
       ex.printStackTrace();
