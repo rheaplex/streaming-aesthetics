@@ -1,5 +1,5 @@
 /*  twitter_streaming_aesthetics - Visualise aesthetic terms from Twitter. 
-    Copyright (C) 2010, 2011 Rob Myers<rob@robmyers.org>
+    Copyright (C) 2010, 2011, 2015 Rob Myers<rob@robmyers.org>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,25 +15,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-
-import fullscreen.*;
-import japplemenubar.*; // Fullscreen imports this
-
 
 /*******************************************************************************
   Configuration
 *******************************************************************************/
 
-// The root of a Twitter streaming API filter search that tracks keywords
-String twitterStreamingTrack = "1/statuses/filter.json?track=";
-
 // Drawing area size and width
-int sizeWidth = 600;
-int sizeHeight = 400;
-int sizeMax = max(sizeWidth, sizeHeight);
+int sizeMax = max(displayWidth, displayHeight);
 
 // How many pixels the shapes should grow each second 
 float growth_rate_per_second = 10;
@@ -59,27 +47,11 @@ float shapeAddSize = padding;
 // The last time we drew
 float lastDrawMillis;
 
-// Fullscreen app, if needed
-FullScreen fs;
-
 float initialSize = 1.0;
 
 /*******************************************************************************
   Setup
 *******************************************************************************/
-
-// Get the Twitter account details needed to access the streaming api
-
-boolean setupConfiguration () {
-  boolean configured = false;
-  // try to get the details form a properties file
-  configured = configureFromProperties();
-  if (! configured) {
-    ConfigurationDialog getter = new ConfigurationDialog();
-    configured = getter.configured();
-  }
-  return configured;
-}
 
 // Make objects Java's syntax doesn't allow us to initialize when we declaer
 
@@ -91,41 +63,26 @@ void initializeData () {
 // Set up the window or screen
 
 void initializeDisplay () {
-  frame.setTitle("Streaming Aesthetics (Shape)");
-  if (fullscreen) {
-    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    sizeWidth = screen.width;
-    sizeHeight = screen.height;
-    sizeMax = max(sizeWidth, sizeHeight);
-  }
-  size(sizeWidth, sizeHeight);
-  if (fullscreen) {
-    fs = new FullScreen(this);
-    fs.enter();
-    noCursor();
-  } else {
-    size(sizeWidth, sizeHeight); 
-  }
+  size(displayWidth, displayHeight);
+  sizeMax = max(displayWidth, displayHeight);
+  noCursor();
+}
+
+// And connect to Twitter
+
+void initializeTwitter () {
+  StatusListener listener = createStatusListener();
+  createFilteredStream(listener); 
 }
 
 // The Processing setup method
 
 void setup () {
-  // Get the information we need to configure the program
-  boolean configured = setupConfiguration();
-  if (configured) {
-    initializeData();
-    initializeDisplay();
-    // Set the initial "last drawing time" as late as possible
-    lastDrawMillis = millis();
-    // Set the stream filter processor going
-    initializeStatusListener (shapes, twitterUser, twitterPassword);
-    // Seems to help convince the sketch to run on Fedora 13
-    frameRate(24);
-    loop();
-  } else {
-    exit();
-  }
+  initializeData();
+  initializeDisplay();
+  initializeTwitter();
+  // Set the initial "last drawing time" as late as possible
+  lastDrawMillis = millis();
 }
 
 
@@ -227,7 +184,7 @@ void setDrawParams () {
     strokeJoin(ROUND);
     strokeCap(ROUND);
     background(255);
-    translate(sizeWidth / 2.0, sizeHeight / 2.0);
+    translate(displayWidth / 2.0, displayHeight / 2.0);
 }
 
 // Draw the shapes
